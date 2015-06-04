@@ -25,8 +25,8 @@ $header=array(
 	      );
 	      
 $client->getClient()->setDefaultOption('config/curl/'.CURLOPT_HTTPHEADER, $header);
-$client->getClient()->setDefaultOption('config/curl/'.CURLOPT_PROXY, '52.24.15.87');
-$client->getClient()->setDefaultOption('config/curl/'.CURLOPT_PROXYPORT, '3128');
+$client->getClient()->setDefaultOption('config/curl/'.CURLOPT_PROXY, '107.182.17.149');
+$client->getClient()->setDefaultOption('config/curl/'.CURLOPT_PROXYPORT, '7808');
 
 $crawler = $client->request('GET', $poor_bastard);
 
