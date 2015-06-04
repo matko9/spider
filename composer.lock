@@ -4,8 +4,49 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "85e3829e7d8002fb5946122ea6c8547c",
+    "hash": "def6d0d635c365ccbd40d32c2c41d527",
     "packages": [
+        {
+            "name": "dunglas/php-torcontrol",
+            "version": "v1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/dunglas/php-torcontrol.git",
+                "reference": "dbd16f2996a1d23a6bfa6476d923dd17b42ff11a"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/dunglas/php-torcontrol/zipball/dbd16f2996a1d23a6bfa6476d923dd17b42ff11a",
+                "reference": "dbd16f2996a1d23a6bfa6476d923dd17b42ff11a",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.4"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Kévin Dunglas",
+                    "email": "dunglas@gmail.com",
+                    "homepage": "http://dunglas.fr"
+                }
+            ],
+            "description": "Tor control library",
+            "homepage": "http://dunglas.fr",
+            "keywords": [
+                "tor"
+            ],
+            "time": "2013-08-20 20:12:12"
+        },
         {
             "name": "fabpot/goutte",
             "version": "v2.0.4",
