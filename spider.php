@@ -12,6 +12,7 @@ use Goutte\Client;
 class Sleep
 {
   private $count = 0;
+  private $tc;
 
   public static function getInstance()
   {
@@ -25,6 +26,14 @@ class Sleep
 
   protected function __construct()
   {
+    $this->tc = new TorControl\TorControl(
+      array(
+        'server' => '127.0.0.1',
+        'port'   => 9051,
+        'password' => 'test',
+        'authmethod' => 1
+      )
+    );
   }
 
   private function __clone()
@@ -40,41 +49,29 @@ class Sleep
     sleep(1);
     $this->count++;
     if($this->count > 20) {
-      $this->tor_new_identity();
-      $this->count = 0;
+
+      $this->tc->connect();
+
+      $this->tc->authenticate();
+
+// Renew identity
+      $res = $this->tc->executeCommand('SIGNAL NEWNYM');
+
+// Echo the server reply code and message
+      echo $res[0]['code'].': '.$res[0]['message'];
+
+// Quit
+      $this->tc->quit();
       echo "new tor identity";
       sleep(10);
     }
   }
 
-  /**
-   * Switch TOR to a new identity.
-   **/
-  public function tor_new_identity($tor_ip='127.0.0.1', $control_port='9051', $auth_code=''){
-    $fp = fsockopen($tor_ip, $control_port, $errno, $errstr, 30);
-    if (!$fp) return false; //can't connect to the control port
-
-    fputs($fp, "AUTHENTICATE $auth_code\r\n");
-    $response = fread($fp, 1024);
-    list($code, $text) = explode(' ', $response, 2);
-    if ($code != '250') return false; //authentication failed
-
-    //send the request to for new identity
-    fputs($fp, "signal NEWNYM\r\n");
-    $response = fread($fp, 1024);
-    list($code, $text) = explode(' ', $response, 2);
-    echo $text;
-    if ($code != '250') return false; //signal failed
-
-    fclose($fp);
-    return true;
-  }
 }
 
 
 $poor_bastard = "http://www.azlyrics.com/";
 
-Sleep::getInstance()->tor_new_identity();
 
 $client = new Client();
 
