@@ -9,26 +9,72 @@ require_once './vendor/autoload.php';
 
 use Goutte\Client;
 
+class Sleep
+{
+  private $count = 0;
 
+  public static function getInstance()
+  {
+    static $instance = null;
+    if (null === $instance) {
+      $instance = new static();
+    }
 
-function getProxy(){
+    return $instance;
+  }
 
-  $proxies = array(
-    'http://107.182.17.149:7808',
-    'http://104.41.151.86:80',
-    'http://45.55.131.56:3128',
-  );
+  protected function __construct()
+  {
+  }
 
-  $proxy =  $proxies[mt_rand(0, count($proxies) - 1)];
+  private function __clone()
+  {
+  }
 
-  echo "Using proxy: ".$proxy . PHP_EOL;
+  private function __wakeup()
+  {
+  }
 
-  return $proxy;
+  public function sleep(){
+
+    sleep(1);
+    $this->count++;
+    if($this->count > 20) {
+      $this->tor_new_identity();
+      $this->count = 0;
+      echo "new tor identity";
+      sleep(10);
+    }
+  }
+
+  /**
+   * Switch TOR to a new identity.
+   **/
+  public function tor_new_identity($tor_ip='127.0.0.1', $control_port='9051', $auth_code=''){
+    $fp = fsockopen($tor_ip, $control_port, $errno, $errstr, 30);
+    if (!$fp) return false; //can't connect to the control port
+
+    fputs($fp, "AUTHENTICATE $auth_code\r\n");
+    $response = fread($fp, 1024);
+    list($code, $text) = explode(' ', $response, 2);
+    if ($code != '250') return false; //authentication failed
+
+    //send the request to for new identity
+    fputs($fp, "signal NEWNYM\r\n");
+    $response = fread($fp, 1024);
+    list($code, $text) = explode(' ', $response, 2);
+    echo $text;
+    if ($code != '250') return false; //signal failed
+
+    fclose($fp);
+    return true;
+  }
 }
 
 
 $poor_bastard = "http://www.azlyrics.com/";
 
+Sleep::getInstance()->tor_new_identity();
 
 $client = new Client();
 
@@ -36,10 +82,10 @@ $client = new Client();
 $client->setHeader('User-Agent', "Googlebot");
 
 
-//$guzzle = $client->getClient();
+$guzzle = $client->getClient();
 
-//$guzzle->setDefaultOption('proxy', getProxy());
-//$client->setClient($guzzle);
+$guzzle->setDefaultOption('proxy', 'socks5://127.0.0.1:9050');
+$client->setClient($guzzle);
 
 
 $crawler = $client->request('GET', $poor_bastard);
@@ -47,7 +93,7 @@ $crawler = $client->request('GET', $poor_bastard);
 $lyricsTxt = fopen("lyrics.txt", "w");
 
 $crawler->filterXPath('//*[@id="artists-collapse"]/li/div/a')->each(function ($node) use ($client, $lyricsTxt) {
-  sleep(1);
+  Sleep::getInstance()->sleep();
   $page = $client->click($node->link());
 
   $page->filterXPath('//html/body/div[2]/div/div/a')->each(function ($node) use ($client, $lyricsTxt) {
@@ -60,7 +106,7 @@ $crawler->filterXPath('//*[@id="artists-collapse"]/li/div/a')->each(function ($n
       $artistDetails,
       $lyricsTxt
     ) {
-      sleep(0.5);
+      Sleep::getInstance()->sleep();
       $songTitle = $node->text();
 
       $song = $client->click($node->link());
@@ -74,8 +120,7 @@ $crawler->filterXPath('//*[@id="artists-collapse"]/li/div/a')->each(function ($n
       ));
 
       fwrite($lyricsTxt, $data);
-      sleep(0.2);
-      echo("\n\n" . $data);
+      Sleep::getInstance()->sleep();
 
     });
 
