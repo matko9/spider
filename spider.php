@@ -44,32 +44,39 @@ $client->setHeader('User-Agent', "Googlebot");
 
 $crawler = $client->request('GET', $poor_bastard);
 
-$crawler->filterXPath('//*[@id="artists-collapse"]/li/div/a')->each(function ($node) use ($client) {
+$lyricsTxt = fopen("lyrics.txt", "w");
+
+$crawler->filterXPath('//*[@id="artists-collapse"]/li/div/a')->each(function ($node) use ($client, $lyricsTxt) {
   sleep(1);
   $page = $client->click($node->link());
 
-  $page->filterXPath('//html/body/div[2]/div/div/a')->each(function ($node) use ($client) {
+  $page->filterXPath('//html/body/div[2]/div/div/a')->each(function ($node) use ($client, $lyricsTxt) {
 
     $artist = $client->click($node->link());
     $artistDetails = $node->text();
 
     $artist->filterXPath('//*[@id="listAlbum"]/a[@target="_blank"]')->each(function ($node) use (
       $client,
-      $artistDetails
+      $artistDetails,
+      $lyricsTxt
     ) {
-      sleep(1);
+      sleep(0.5);
       $songTitle = $node->text();
 
       $song = $client->click($node->link());
 
       $text = $song->filterXPath('//html/body/div[3]/div/div[2]/div[6]')->text();
 
-      //pisi u fajl
-      var_dump(array(
+      $data = json_encode(array(
         "artist" => $artistDetails,
         "title" => $songTitle,
         "lyrics" => $text
       ));
+
+      fwrite($lyricsTxt, $data);
+      sleep(0.2);
+      echo("\n\n" . $data);
+
     });
 
 
