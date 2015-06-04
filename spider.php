@@ -1,9 +1,9 @@
 <?php
+
 ini_set('max_execution_time', 0);
 
 error_reporting(E_ALL);
 ini_set('display_errors', '1');
-
 
 require_once './vendor/autoload.php';
 
@@ -69,7 +69,6 @@ class Sleep
 
 }
 
-
 $poor_bastard = "http://www.azlyrics.com/";
 
 
@@ -104,6 +103,7 @@ $crawler->filterXPath('//*[@id="artists-collapse"]/li/div/a')->each(function ($n
       $lyricsTxt
     ) {
       Sleep::getInstance()->sleep();
+
       $songTitle = $node->text();
 
       $song = $client->click($node->link());
@@ -121,10 +121,8 @@ $crawler->filterXPath('//*[@id="artists-collapse"]/li/div/a')->each(function ($n
 
     });
 
-
   });
-
 
 });
 
-
+fclose($lyricsTxt);
