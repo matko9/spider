@@ -9,13 +9,6 @@ require_once './vendor/autoload.php';
 
 use Goutte\Client;
 
-$poor_bastard = "http://www.azlyrics.com/";
-
-
-$client = new Client();
-
-$crawler = $client->request('GET', $poor_bastard);
-
 
 
 function getProxy(){
@@ -33,40 +26,39 @@ function getProxy(){
   return $proxy;
 }
 
+
+$poor_bastard = "http://www.azlyrics.com/";
+
+
+$client = new Client();
+
+
 $client->setHeader('User-Agent', "Googlebot");
 
 
-$guzzle = $client->getClient();
+//$guzzle = $client->getClient();
 
-$guzzle->setDefaultOption('proxy', getProxy());
-$client->setClient($guzzle);
+//$guzzle->setDefaultOption('proxy', getProxy());
+//$client->setClient($guzzle);
 
+
+$crawler = $client->request('GET', $poor_bastard);
 
 $crawler->filterXPath('//*[@id="artists-collapse"]/li/div/a')->each(function ($node) use ($client) {
-
-  $guzzle = $client->getClient();
-  $guzzle->setDefaultOption('proxy', getProxy());
-  $client->setClient($guzzle);
-
+  sleep(1);
   $page = $client->click($node->link());
-  echo "Parsing: ". $node->text();
-  $page->filterXPath('//html/body/div[2]/div/div/a')->each(function ($node) use ($client) {
 
-    $guzzle = $client->getClient();
-    $guzzle->setDefaultOption('proxy', getProxy());
-    $client->setClient($guzzle);
+  $page->filterXPath('//html/body/div[2]/div/div/a')->each(function ($node) use ($client) {
 
     $artist = $client->click($node->link());
     $artistDetails = $node->text();
-echo "parsing: " . $node->text();
+
     $artist->filterXPath('//*[@id="listAlbum"]/a[@target="_blank"]')->each(function ($node) use (
       $client,
-      $artistDetails) {
+      $artistDetails
+    ) {
+      sleep(1);
       $songTitle = $node->text();
-
-      $guzzle = $client->getClient();
-      $guzzle->setDefaultOption('proxy', getProxy());
-      $client->setClient($guzzle);
 
       $song = $client->click($node->link());
 
