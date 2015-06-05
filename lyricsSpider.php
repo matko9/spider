@@ -82,7 +82,7 @@ $client->setHeader('User-Agent', "Googlebot");
 
 $crawler = $client->request('GET', $poor_bastard);
 
-$lyricsTxt = fopen("lyrics.txt", "w");
+$lyricsTxt = fopen("songLyrics.txt", "w");
 
 $status_code = $client->getResponse()->getStatus();
 echo $status_code . "\n";
@@ -109,13 +109,7 @@ $crawler->filterXPath('//*[@id="artists-collapse"]/li/div/a')->each(function ($n
 
       $text = $song->filterXPath('//html/body/div[3]/div/div[2]/div[6]')->text();
 
-      $data = json_encode(array(
-        "artist" => $artistDetails,
-        "title" => $songTitle,
-        "lyrics" => $text
-      ));
-
-      fwrite($lyricsTxt, $data);
+      fwrite($lyricsTxt, $text);
       Sleep::getInstance()->sleep();
 
     });
